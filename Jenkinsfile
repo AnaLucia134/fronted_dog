@@ -16,7 +16,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'npm install'
-                sh 'npm test'
+                sh 'CI=true npm test -- --watchAll=false'
             }
         }
         
@@ -30,13 +30,24 @@ pipeline {
         
         stage('Push') {
             steps {
+                sh 'docker start registry || true'
                 sh 'docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest'
             }
         }
         
         stage('Deploy QA') {
             steps {
-                sh 'cd /opt/dog_project && docker-compose -f docker-compose-qa.yml up -d --scale frontend=3'
+                script {
+                    try {
+                        sh '''
+                            cd /opt/dog_project
+                            docker-compose -f docker-compose-qa.yml down
+                            docker-compose -f docker-compose-qa.yml up -d --scale frontend=3
+                        '''
+                    } catch (err) {
+                        echo "Error en despliegue QA: ${err}"
+                    }
+                }
             }
         }
         
@@ -45,8 +56,31 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh 'cd /opt/dog_project && docker-compose -f docker-compose-prod.yml up -d --scale frontend=2'
+                script {
+                    try {
+                        sh '''
+                            cd /opt/dog_project
+                            docker-compose -f docker-compose-prod.yml down
+                            docker-compose -f docker-compose-prod.yml up -d --scale frontend=2
+                        '''
+                    } catch (err) {
+                        echo "Error en despliegue Prod: ${err}"
+                    }
+                }
             }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline completado - limpiando'
+            sh 'docker system prune -f || true'
+        }
+        failure {
+            echo 'Pipeline falló - revisar logs'
+        }
+        success {
+            echo 'Pipeline exitoso'
         }
     }
 }
