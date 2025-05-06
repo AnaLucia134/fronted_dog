@@ -4,22 +4,12 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "192.241.148.118:5000"
         IMAGE_NAME = "frontend-dog"
-        NODE_VERSION = "16"
     }
     
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'develop', url: 'https://github.com/AnaLucia134/fronted_dog.git'
-            }
-        }
-        
-        stage('Setup Node') {
-            steps {
-                sh """
-                    nvm install ${NODE_VERSION}
-                    nvm use ${NODE_VERSION}
-                """
             }
         }
         
