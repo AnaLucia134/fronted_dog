@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { ListGroup, Spinner } from 'react-bootstrap';
 
 export default function SubBreedList({ breed, onSelect }) {
   const [subBreeds, setSubBreeds] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchSubBreeds = async () => {
+  // Mueve fetchSubBreeds dentro de un useCallback para memoización
+  const fetchSubBreeds = useCallback(async () => {
     if (!breed) return;
     setLoading(true);
     try {
@@ -19,11 +20,11 @@ export default function SubBreedList({ breed, onSelect }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [breed]); // breed es una dependencia aquí
 
   useEffect(() => {
     fetchSubBreeds();
-  }, [breed]);
+  }, [breed, fetchSubBreeds]); // Ahora incluye todas las dependencias
 
   if (!breed) return null;
 
