@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
@@ -12,3 +13,4 @@ test('renders description text', () => {
   const descElement = screen.getByText(/Descubre razas y disfruta imágenes/i);
   expect(descElement).toBeInTheDocument();
 });
+
