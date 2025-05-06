@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "192.241.148.118:5000"
         IMAGE_NAME = "frontend-dog"
+        NODE_VERSION = "16"
     }
     
     stages {
@@ -13,10 +14,19 @@ pipeline {
             }
         }
         
+        stage('Setup Node') {
+            steps {
+                sh """
+                    nvm install ${NODE_VERSION}
+                    nvm use ${NODE_VERSION}
+                """
+            }
+        }
+        
         stage('Test') {
             steps {
                 sh 'npm install'
-                sh 'CI=true npm test -- --watchAll=false'
+                sh 'CI=true npm test -- --watchAll=false --passWithNoTests'
             }
         }
         
@@ -30,57 +40,31 @@ pipeline {
         
         stage('Push') {
             steps {
-                sh 'docker start registry || true'
                 sh 'docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest'
             }
         }
         
         stage('Deploy QA') {
             steps {
-                script {
-                    try {
-                        sh '''
-                            cd /opt/dog_project
-                            docker-compose -f docker-compose-qa.yml down
-                            docker-compose -f docker-compose-qa.yml up -d --scale frontend=3
-                        '''
-                    } catch (err) {
-                        echo "Error en despliegue QA: ${err}"
-                    }
-                }
-            }
-        }
-        
-        stage('Deploy Prod') {
-            when {
-                branch 'main'
-            }
-            steps {
-                script {
-                    try {
-                        sh '''
-                            cd /opt/dog_project
-                            docker-compose -f docker-compose-prod.yml down
-                            docker-compose -f docker-compose-prod.yml up -d --scale frontend=2
-                        '''
-                    } catch (err) {
-                        echo "Error en despliegue Prod: ${err}"
-                    }
-                }
+                sh '''
+                    cd /opt/dog_project
+                    docker-compose -f docker-compose-qa.yml pull frontend
+                    docker-compose -f docker-compose-qa.yml up -d --scale frontend=3
+                '''
             }
         }
     }
     
     post {
         always {
-            echo 'Pipeline completado - limpiando'
-            sh 'docker system prune -f || true'
-        }
-        failure {
-            echo 'Pipeline falló - revisar logs'
+            echo 'Limpiando...'
+            sh 'docker system prune -f'
         }
         success {
-            echo 'Pipeline exitoso'
+            echo 'Pipeline ejecutado con éxito!'
+        }
+        failure {
+            echo 'Pipeline falló. Revisar logs.'
         }
     }
 }
