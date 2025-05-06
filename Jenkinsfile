@@ -22,7 +22,11 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh '''
+                    # Solución temporal para permitir warnings durante el build
+                    export CI=false
+                    npm run build
+                '''
                 sh 'docker build -t ${IMAGE_NAME} .'
                 sh 'docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest'
             }

@@ -10,7 +10,7 @@ export default function SubBreedList({ breed, onSelect }) {
     if (!breed) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/subbreeds`);
+      const response = await fetch(`/api/dogs/breed/${breed}/subbreeds`)
       const data = await response.json();
       if (data.message) {
         setSubBreeds(data.message);
