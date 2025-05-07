@@ -21,9 +21,8 @@ export default function SubBreedList({ breed, onSelect }) {
     }
   };
 
-  useEffect(() => {
-    fetchSubBreeds();
-  }, [breed, fetchSubBreeds]);
+  fetchSubBreeds();
+}, [breed]);
 
   if (!breed) return null;
 

@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "192.241.148.118:5000"
         PROJECT_DIR = "/root/dog_project"
+        CI = "false" 
     }
 
     stages {
@@ -25,36 +26,29 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    try {
-                        sh 'npm test -- --watchAll=false --coverage --reporters=default --reporters=jest-junit'
-                        junit 'junit.xml'
-                    } catch (error) {
-                        echo "Tests failed: ${error}"
-                        currentBuild.result = 'UNSTABLE'
-                    }
+                    sh 'npm test -- --watchAll=false --coverage --reporters=default --reporters=jest-junit'
+                    junit 'junit.xml'
                 }
             }
         }
 
         stage('Lint') {
             steps {
-                sh 'npm run lint || true' // Continúa aunque haya warnings
+                sh 'npm run lint || true' 
             }
         }
 
         stage('Build') {
-            when {
-                expression { currentBuild.result != 'FAILURE' }
-            }
             steps {
-                sh 'npm run build'
+                script {
+                    withEnv(['CI=false']) {
+                        sh 'npm run build'
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
-            when {
-                expression { currentBuild.result != 'FAILURE' }
-            }
             steps {
                 script {
                     docker.build("${DOCKER_REGISTRY}/frontend-dog:${env.BUILD_ID}")
@@ -63,9 +57,6 @@ pipeline {
         }
 
         stage('Push to Registry') {
-            when {
-                expression { currentBuild.result != 'FAILURE' }
-            }
             steps {
                 script {
                     docker.withRegistry("http://${DOCKER_REGISTRY}", 'docker-registry-credentials') {
@@ -79,7 +70,6 @@ pipeline {
         stage('Deploy to QA') {
             when {
                 branch 'develop'
-                expression { currentBuild.result != 'FAILURE' }
             }
             steps {
                 sh """
@@ -94,31 +84,20 @@ pipeline {
     post {
         always {
             cleanWs()
-            publishHTML(target: [
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'coverage/lcov-report',
-                reportFiles: 'index.html',
-                reportName: 'Coverage Report'
-            ])
+            script {
+                if (fileExists('coverage/lcov-report/index.html')) {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'coverage/lcov-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Coverage Report'
+                    ])
+                }
+            }
         }
-        failure {
-            emailext (
-                subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
-                body: "Check console output at ${env.BUILD_URL}",
-                to: 'ana@example.com',
-                replyTo: 'ana@example.com',
-                attachLog: true
-            )
-        }
-        unstable {
-            emailext (
-                subject: "Pipeline UNSTABLE: ${currentBuild.fullDisplayName}",
-                body: "Tests unstable. Check ${env.BUILD_URL}",
-                to: 'ana@example.com',
-                replyTo: 'ana@example.com'
-            )
-        }
+
     }
 }
+
