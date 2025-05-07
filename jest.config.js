@@ -1,10 +1,13 @@
 module.exports = {
   testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.(js|jsx)$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!react-bootstrap)'
+  ],
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
-  collectCoverage: true,
-  coverageReporters: ['lcov', 'text'],
-  reporters: [
-    'default',
-    ['jest-junit', { outputDirectory: '.', outputName: 'junit.xml' }]
-  ]
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  }
 };

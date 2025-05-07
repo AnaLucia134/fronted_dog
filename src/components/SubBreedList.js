@@ -5,24 +5,25 @@ export default function SubBreedList({ breed, onSelect }) {
   const [subBreeds, setSubBreeds] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchSubBreeds = async () => {
-    if (!breed) return;
-    setLoading(true);
-    try {
-      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/subbreeds`);
-      const data = await response.json();
-      if (data.message) {
-        setSubBreeds(data.message);
+  useEffect(() => {
+    const fetchSubBreeds = async () => {
+      if (!breed) return;
+      setLoading(true);
+      try {
+        const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/subbreeds`);
+        const data = await response.json();
+        if (data.message) {
+          setSubBreeds(data.message);
+        }
+      } catch (error) {
+        console.error('Error al obtener las subrazas:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error al obtener las subrazas:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchSubBreeds();
-}, [breed]);
+    fetchSubBreeds();
+  }, [breed]);
 
   if (!breed) return null;
 
@@ -57,4 +58,3 @@ export default function SubBreedList({ breed, onSelect }) {
     </div>
   );
 }
-
