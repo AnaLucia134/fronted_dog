@@ -28,7 +28,12 @@
       "!src/index.js",
       "!src/serviceWorker.js"
     ],
-    "coverageReporters": ["json", "lcov", "text", "clover"]
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +52,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jest-junit": "^16.0.0"
   }
 }
-
