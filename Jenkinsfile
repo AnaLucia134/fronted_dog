@@ -18,27 +18,20 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+                sh 'npm install --save-dev jest-junit'
             }
         }
 
         stage('Run Tests') {
             steps {
                 script {
-                    // Ejecutar tests y generar reporte JUnit
-                    sh 'npm test -- --watchAll=false --coverage --reporters=default --reporters=jest-junit'
-                    
-                    // Publicar resultados de los tests
-                    junit 'junit.xml' // Asegúrate que jest-junit genera este archivo
-                    
-                    // Publicar reporte de cobertura
-                    publishHTML(target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'coverage/lcov-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report'
-                    ])
+                    try {
+                        sh 'npm test -- --watchAll=false --coverage --reporters=default --reporters=jest-junit'
+                        junit 'junit.xml'
+                    } catch (error) {
+                        echo "Tests failed: ${error}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
                 }
             }
         }
@@ -50,12 +43,18 @@ pipeline {
         }
 
         stage('Build') {
+            when {
+                expression { currentBuild.result != 'FAILURE' }
+            }
             steps {
                 sh 'npm run build'
             }
         }
 
         stage('Build Docker Image') {
+            when {
+                expression { currentBuild.result != 'FAILURE' }
+            }
             steps {
                 script {
                     docker.build("${DOCKER_REGISTRY}/frontend-dog:${env.BUILD_ID}")
@@ -64,6 +63,9 @@ pipeline {
         }
 
         stage('Push to Registry') {
+            when {
+                expression { currentBuild.result != 'FAILURE' }
+            }
             steps {
                 script {
                     docker.withRegistry("http://${DOCKER_REGISTRY}", 'docker-registry-credentials') {
@@ -77,6 +79,7 @@ pipeline {
         stage('Deploy to QA') {
             when {
                 branch 'develop'
+                expression { currentBuild.result != 'FAILURE' }
             }
             steps {
                 sh """
@@ -91,19 +94,30 @@ pipeline {
     post {
         always {
             cleanWs()
+            publishHTML(target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'coverage/lcov-report',
+                reportFiles: 'index.html',
+                reportName: 'Coverage Report'
+            ])
         }
         failure {
             emailext (
                 subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
                 body: "Check console output at ${env.BUILD_URL}",
-                to: 'ana@example.com'
+                to: 'ana@example.com',
+                replyTo: 'ana@example.com',
+                attachLog: true
             )
         }
         unstable {
             emailext (
                 subject: "Pipeline UNSTABLE: ${currentBuild.fullDisplayName}",
                 body: "Tests unstable. Check ${env.BUILD_URL}",
-                to: 'ana@example.com'
+                to: 'ana@example.com',
+                replyTo: 'ana@example.com'
             )
         }
     }

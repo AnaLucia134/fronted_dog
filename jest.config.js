@@ -1,6 +1,7 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  testMatch: ['**/src/**/*.test.js'],
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+  collectCoverage: true,
   coverageReporters: ['lcov', 'text'],
   reporters: [
     'default',
