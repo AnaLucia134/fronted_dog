@@ -23,7 +23,7 @@ export default function SubBreedList({ breed, onSelect }) {
 
   useEffect(() => {
     fetchSubBreeds();
-  }, [breed]);
+  }, [breed, fetchSubBreeds]);
 
   if (!breed) return null;
 
