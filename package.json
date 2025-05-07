@@ -20,7 +20,17 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+    "test": "react-scripts test --watchAll=false --coverage",
+    "lint": "eslint src"
   },
+"jest": {
+  "collectCoverageFrom": [
+    "src/**/*.{js,jsx}",
+    "!src/index.js",
+    "!src/serviceWorker.js"
+  ],
+  "coverageReporters": ["json", "lcov", "text", "clover"]
+},
   "eslintConfig": {
     "extends": [
       "react-app",
