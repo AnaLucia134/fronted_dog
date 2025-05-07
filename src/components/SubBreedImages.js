@@ -18,7 +18,7 @@ export default function SubBreedImages({ breed, subBreed }) {
     if (!breed || !subBreed) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/dogs/breed/${breed}/${subBreed}/images`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/${subBreed}/images`);
       const data = await response.json();
       if (data.message) {
         setAllImages(data.message);
@@ -34,7 +34,7 @@ export default function SubBreedImages({ breed, subBreed }) {
     if (!breed || !subBreed) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/${subBreed}/random`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/${subBreed}/random`);
       const data = await response.json();
       if (data.message) {
         setRandomImage(data.message);
@@ -50,7 +50,7 @@ export default function SubBreedImages({ breed, subBreed }) {
     if (!breed || !subBreed || !quantity) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/${subBreed}/random/${quantity}`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/${subBreed}/random/${quantity}`);
       const data = await response.json();
       if (data.message) {
         setMultipleImages(data.message);

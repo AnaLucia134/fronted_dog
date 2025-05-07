@@ -8,7 +8,7 @@ export default function RandomDogWithAlt() {
   const fetchDogWithAlt = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/dogs/random/alt');
+      const response = await fetch('http://192.241.148.118:3000/api/dogs/random/alt');
       const data = await response.json();
       if (data.message) {
         setDogData(data.message);
@@ -40,3 +40,4 @@ export default function RandomDogWithAlt() {
     </div>
   );
 }
+

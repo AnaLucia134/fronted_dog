@@ -18,7 +18,7 @@ export default function BreedImages({ breed }) {
     if (!breed) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/images`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/images`);
       const data = await response.json();
       if (data.message) {
         setAllImages(data.message);
@@ -34,7 +34,7 @@ export default function BreedImages({ breed }) {
     if (!breed) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/random`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/random`);
       const data = await response.json();
       if (data.message) {
         setRandomImage(data.message);
@@ -50,7 +50,7 @@ export default function BreedImages({ breed }) {
     if (!breed || !quantity) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/breed/${breed}/random/${quantity}`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/random/${quantity}`);
       const data = await response.json();
       if (data.message) {
         setMultipleImages(data.message);
@@ -132,3 +132,4 @@ export default function BreedImages({ breed }) {
     </div>
   );
 }
+

@@ -14,7 +14,7 @@ export default function Home() {
   const fetchRandomDog = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/dogs/random');
+      const response = await fetch('http://192.241.148.118:3000/api/dogs/random');
       const data = await response.json();
       setImageUrl(data.message);
     } catch (error) {
@@ -32,7 +32,7 @@ export default function Home() {
       </div>
 
       <div className="row w-100 justify-content-center g-4" style={{ maxWidth: '1200px' }}>
-        
+
         {/* Card: Imagen Aleatoria */}
         <div className="col-12 col-md-6">
           <div className="card shadow-sm h-100">
@@ -117,3 +117,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -8,7 +8,7 @@ export default function BreedSelector({ onSelect }) {
   const fetchBreeds = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/dogs/breeds');
+      const response = await fetch('http://192.241.148.118:3000/api/dogs/breeds');
       const data = await response.json();
       if (data.message) {
         setBreeds(Object.keys(data.message));
@@ -47,3 +47,4 @@ export default function BreedSelector({ onSelect }) {
     </Form.Group>
   );
 }
+

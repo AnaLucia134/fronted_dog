@@ -9,7 +9,7 @@ export default function MultipleRandomDogs() {
   const fetchMultipleDogs = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/dogs/random/${quantity}`);
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/random/${quantity}`);
       const data = await response.json();
       if (data.message) {
         setImages(data.message);
@@ -28,7 +28,7 @@ export default function MultipleRandomDogs() {
   return (
     <div className="mt-5">
       <h3>🐶 Múltiples Imágenes Aleatorias</h3>
-      
+
       <Form className="d-flex align-items-center justify-content-center mb-3">
         <Form.Control
           type="number"
@@ -58,3 +58,4 @@ export default function MultipleRandomDogs() {
     </div>
   );
 }
+

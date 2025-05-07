@@ -1,16 +1,15 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { ListGroup, Spinner } from 'react-bootstrap';
 
 export default function SubBreedList({ breed, onSelect }) {
   const [subBreeds, setSubBreeds] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Mueve fetchSubBreeds dentro de un useCallback para memoización
-  const fetchSubBreeds = useCallback(async () => {
+  const fetchSubBreeds = async () => {
     if (!breed) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/dogs/breed/${breed}/subbreeds`)
+      const response = await fetch(`http://192.241.148.118:3000/api/dogs/breed/${breed}/subbreeds`);
       const data = await response.json();
       if (data.message) {
         setSubBreeds(data.message);
@@ -20,11 +19,11 @@ export default function SubBreedList({ breed, onSelect }) {
     } finally {
       setLoading(false);
     }
-  }, [breed]); // breed es una dependencia aquí
+  };
 
   useEffect(() => {
     fetchSubBreeds();
-  }, [breed, fetchSubBreeds]); // Ahora incluye todas las dependencias
+  }, [breed]);
 
   if (!breed) return null;
 
@@ -59,3 +58,4 @@ export default function SubBreedList({ breed, onSelect }) {
     </div>
   );
 }
+
